@@ -26,14 +26,6 @@ export async function runCommand(
   const injection = injectPort(command, availablePort);
 
   console.log(chalk.blue(`[${projectName}]`) + ` 포트 ${chalk.green(availablePort)} 할당`);
-  console.log(chalk.gray(`도구: ${injection.toolName}`));
-  console.log(chalk.gray(`주입 방식: ${injection.injectionType}`));
-
-  if (injection.injectionType === 'env') {
-    console.log(chalk.gray(`명령어: PORT=${availablePort} ${injection.command}`));
-  } else {
-    console.log(chalk.gray(`명령어: ${injection.command}`));
-  }
 
   // dry-run 모드
   if (options.dryRun) {
