@@ -8,9 +8,8 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/port-arranger"><img src="https://img.shields.io/npm/v/port-arranger.svg" alt="npm version"></a>
-  <img src="https://img.shields.io/github/license/mindori/port-arranger" alt="license">
+  <img src="https://img.shields.io/github/license/mindori/port-arranger?v=2026" alt="license">
   <img src="https://img.shields.io/badge/node-%3E%3D18-brightgreen" alt="node version">
-  <img src="https://img.shields.io/badge/AI-Claude-blueviolet" alt="AI powered by Claude">
 </p>
 
 </div>
@@ -173,7 +172,7 @@ port-arranger stores state in `~/.port-arranger/state.json`:
       "pid": 12345,
       "command": "npm run dev",
       "cwd": "/path/to/project",
-      "startedAt": "2024-01-15T10:30:00.000Z"
+      "startedAt": "2026-02-01T10:30:00.000Z"
     }
   ]
 }
