@@ -58,3 +58,43 @@ export function isProcessRunning(pid: number): boolean {
     return false;
   }
 }
+
+export interface ComposeServiceStatus {
+  serviceName: string;
+  running: boolean;
+}
+
+export async function getComposeServicesStatus(cwd: string): Promise<Map<string, boolean>> {
+  const { execSync } = await import('child_process');
+  const statusMap = new Map<string, boolean>();
+
+  try {
+    // docker compose ps -a --format json으로 서비스 상태 조회 (중지된 것 포함)
+    const output = execSync('docker compose ps -a --format json', {
+      cwd,
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+
+    // 각 줄이 JSON 객체
+    const lines = output.trim().split('\n').filter(Boolean);
+    for (const line of lines) {
+      try {
+        const container = JSON.parse(line);
+        const serviceName = container.Service || container.Name;
+        const state = container.State || '';
+        const isRunning = state.toLowerCase() === 'running';
+        // 이미 running으로 설정된 서비스는 덮어쓰지 않음
+        if (!statusMap.has(serviceName) || isRunning) {
+          statusMap.set(serviceName, isRunning);
+        }
+      } catch {
+        // JSON 파싱 실패 시 무시
+      }
+    }
+  } catch {
+    // docker compose ps 실패 시 빈 맵 반환
+  }
+
+  return statusMap;
+}

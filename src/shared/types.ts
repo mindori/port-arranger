@@ -1,5 +1,31 @@
 // 포트 주입 방식
-export type InjectionType = 'env' | 'flag' | 'arg';
+export type InjectionType = 'env' | 'flag' | 'arg' | 'compose';
+
+// Docker Compose 포트 매핑
+export interface ComposePortMapping {
+  hostPort: number;
+  containerPort: number;
+  protocol?: 'tcp' | 'udp';
+}
+
+// Docker Compose 서비스 포트 정보
+export interface ComposeServicePorts {
+  serviceName: string;
+  ports: ComposePortMapping[];
+}
+
+// Docker Compose 할당된 포트 정보
+export interface AllocatedComposePort extends ComposePortMapping {
+  originalHostPort: number;
+  newHostPort: number;
+}
+
+// Compose 서비스 포트 정보 (저장용)
+export interface ComposeServicePort {
+  serviceName: string;
+  port: number;
+  running?: boolean;  // 실시간 상태 (조회 시 업데이트)
+}
 
 // 프로세스 상태
 export type ProcessStatus = 'running' | 'stopped';
@@ -14,6 +40,7 @@ export interface ProcessMapping {
   cwd: string;               // 작업 디렉토리
   startedAt: string;         // ISO 8601 형식
   status: ProcessStatus;
+  composePorts?: ComposeServicePort[];  // compose 서비스별 포트
 }
 
 // 상태 파일 전체 구조
@@ -34,6 +61,7 @@ export interface CommandPattern {
   name: string;                // 도구 이름 (예: 'vite', 'next')
   patterns: RegExp[];          // 매칭 패턴들
   injectionType: InjectionType;
+  defaultPort: number;         // 도구별 기본 포트
   injectPort: (cmd: string, port: number) => string;
 }
 

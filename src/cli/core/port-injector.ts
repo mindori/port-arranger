@@ -14,6 +14,7 @@ const patterns: CommandPattern[] = [
     name: 'next',
     patterns: [/\bnext\s+dev\b/, /\bnext\s+start\b/, /\bnext\b/],
     injectionType: 'env',
+    defaultPort: 3000,
     injectPort: (cmd) => cmd,
   },
 
@@ -22,6 +23,7 @@ const patterns: CommandPattern[] = [
     name: 'node',
     patterns: [/\bnode\s+\S+\.js\b/, /\bnode\s+\S+\.mjs\b/, /\bnode\s+\S+\.cjs\b/],
     injectionType: 'env',
+    defaultPort: 3000,
     injectPort: (cmd) => cmd,
   },
 
@@ -30,8 +32,46 @@ const patterns: CommandPattern[] = [
     name: 'vite',
     patterns: [/\bvite\b/],
     injectionType: 'flag',
+    defaultPort: 5173,
     injectPort: (cmd, port) => {
       const cleaned = removePortFlag(cmd, '--port');
+      return `${cleaned} --port ${port}`;
+    },
+  },
+
+  // npm run dev (vite 프로젝트) - 플래그 방식
+  {
+    name: 'npm-dev',
+    patterns: [/\bnpm\s+run\s+dev\b/],
+    injectionType: 'flag',
+    defaultPort: 5173,
+    injectPort: (cmd, port) => {
+      // npm run dev -- --port 3001 형태로 전달
+      const cleaned = cmd.replace(/\s+--\s+--port\s+\d+/, '');
+      return `${cleaned} -- --port ${port}`;
+    },
+  },
+
+  // yarn run dev - 플래그 방식
+  {
+    name: 'yarn-dev',
+    patterns: [/\byarn\s+run\s+dev\b/, /\byarn\s+dev\b/],
+    injectionType: 'flag',
+    defaultPort: 5173,
+    injectPort: (cmd, port) => {
+      const cleaned = cmd.replace(/\s+--port\s+\d+/, '');
+      return `${cleaned} --port ${port}`;
+    },
+  },
+
+  // pnpm run dev - 플래그 방식
+  {
+    name: 'pnpm-dev',
+    patterns: [/\bpnpm\s+run\s+dev\b/, /\bpnpm\s+dev\b/],
+    injectionType: 'flag',
+    defaultPort: 5173,
+    injectPort: (cmd, port) => {
+      const cleaned = cmd.replace(/\s+--port\s+\d+/, '');
       return `${cleaned} --port ${port}`;
     },
   },
@@ -41,6 +81,7 @@ const patterns: CommandPattern[] = [
     name: 'uvicorn',
     patterns: [/\buvicorn\b/],
     injectionType: 'flag',
+    defaultPort: 8000,
     injectPort: (cmd, port) => {
       const cleaned = removePortFlag(cmd, '--port');
       return `${cleaned} --port ${port}`;
@@ -52,6 +93,7 @@ const patterns: CommandPattern[] = [
     name: 'fastapi',
     patterns: [/\bfastapi\s+(dev|run)\b/],
     injectionType: 'flag',
+    defaultPort: 8000,
     injectPort: (cmd, port) => {
       const cleaned = removePortFlag(cmd, '--port');
       return `${cleaned} --port ${port}`;
@@ -63,6 +105,7 @@ const patterns: CommandPattern[] = [
     name: 'flask',
     patterns: [/\bflask\s+run\b/],
     injectionType: 'flag',
+    defaultPort: 5000,
     injectPort: (cmd, port) => {
       const cleaned = removePortFlag(cmd, '--port');
       return `${cleaned} --port ${port}`;
@@ -74,6 +117,7 @@ const patterns: CommandPattern[] = [
     name: 'http-server',
     patterns: [/\bhttp-server\b/],
     injectionType: 'flag',
+    defaultPort: 8080,
     injectPort: (cmd, port) => {
       const cleaned = removePortFlag(cmd, '-p');
       return `${cleaned} -p ${port}`;
@@ -85,7 +129,12 @@ const patterns: CommandPattern[] = [
     name: 'http.server',
     patterns: [/python3?\s+-m\s+http\.server/],
     injectionType: 'arg',
-    injectPort: (cmd, port) => `${cmd} ${port}`,
+    defaultPort: 8000,
+    injectPort: (cmd, port) => {
+      // 기존 포트 번호 제거 (http.server 뒤의 숫자)
+      const cleaned = cmd.replace(/(http\.server)\s+\d+/, '$1');
+      return `${cleaned} ${port}`;
+    },
   },
 
   // Django runserver - 인자 방식
@@ -93,7 +142,22 @@ const patterns: CommandPattern[] = [
     name: 'django',
     patterns: [/manage\.py\s+runserver/],
     injectionType: 'arg',
-    injectPort: (cmd, port) => `${cmd} ${port}`,
+    defaultPort: 8000,
+    injectPort: (cmd, port) => {
+      // 기존 포트 번호 제거 (runserver 뒤의 host:port 또는 숫자)
+      // host:port를 먼저 매칭해야 함 (0.0.0.0:8000 등)
+      const cleaned = cmd.replace(/(runserver)\s+([\w.]+:\d+|\d+)/, '$1');
+      return `${cleaned} ${port}`;
+    },
+  },
+
+  // Docker Compose - compose 방식
+  {
+    name: 'docker-compose',
+    patterns: [/docker\s+compose\s+(up|start|run)\b/],
+    injectionType: 'compose',
+    defaultPort: 0, // compose는 yml에서 파싱
+    injectPort: (cmd) => cmd, // compose는 run.ts에서 별도 처리
   },
 ];
 
@@ -106,6 +170,12 @@ function findMatchingPattern(command: string): CommandPattern | null {
     }
   }
   return null;
+}
+
+// 도구별 기본 포트 조회
+export function getDefaultPort(command: string): number {
+  const matchedPattern = findMatchingPattern(command);
+  return matchedPattern?.defaultPort ?? 3000;
 }
 
 export function injectPort(originalCommand: string, port: number): InjectionResult {
