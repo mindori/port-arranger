@@ -1,17 +1,29 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import { runCommand } from './commands/run.js';
 import { listCommand } from './commands/list.js';
 import { stopCommand } from './commands/stop.js';
 import { uiCommand } from './commands/ui.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+function getVersion(): string {
+  const packageJsonPath = join(__dirname, '..', '..', 'package.json');
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
+  return packageJson.version;
+}
 
 const program = new Command();
 
 program
   .name('pa')
   .description('Run multiple dev servers simultaneously without port conflicts')
-  .version('0.0.1');
+  .version(getVersion());
 
 program
   .command('run')
