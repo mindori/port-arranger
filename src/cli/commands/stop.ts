@@ -1,6 +1,8 @@
 import chalk from 'chalk';
+import { execSync } from 'child_process';
 import { getAllProcesses, removeProcess, getProcess } from '../core/state.js';
 import { killProcess, isProcessRunning } from '../core/process-manager.js';
+import type { ProcessMapping } from '../../shared/types.js';
 
 interface StopOptions {
   all?: boolean;
@@ -24,6 +26,22 @@ export async function stopCommand(
   await stopSingleProcess(name);
 }
 
+async function stopComposeProcess(name: string, mapping: ProcessMapping): Promise<void> {
+  const { cwd, pid } = mapping;
+
+  try {
+    execSync('docker compose down', {
+      cwd,
+      stdio: 'pipe',
+    });
+  } catch {
+    // compose down 실패 시 fallback으로 프로세스 kill
+    if (isProcessRunning(pid)) {
+      await killProcess(pid);
+    }
+  }
+}
+
 async function stopSingleProcess(name: string): Promise<void> {
   const mapping = await getProcess(name);
 
@@ -34,6 +52,18 @@ async function stopSingleProcess(name: string): Promise<void> {
   }
 
   const { pid } = mapping;
+
+  // Docker Compose인 경우 다른 방식으로 종료
+  if (mapping.injectionType === 'compose') {
+    try {
+      await stopComposeProcess(name, mapping);
+      await removeProcess(name);
+      console.log(chalk.green(`✓ ${name} (Docker Compose stopped)`));
+    } catch (error) {
+      console.log(chalk.red(`Failed to stop Docker Compose: ${(error as Error).message}`));
+    }
+    return;
+  }
 
   if (!isProcessRunning(pid)) {
     console.log(chalk.yellow(`Process '${name}' already stopped.`));
@@ -67,11 +97,16 @@ async function stopAllProcesses(): Promise<void> {
 
   for (const [name, mapping] of entries) {
     try {
-      if (isProcessRunning(mapping.pid)) {
+      if (mapping.injectionType === 'compose') {
+        await stopComposeProcess(name, mapping);
+        console.log(chalk.green(`  ✓ ${name} (Docker Compose stopped)`));
+      } else if (isProcessRunning(mapping.pid)) {
         await killProcess(mapping.pid);
+        console.log(chalk.green(`  ✓ ${name} (PID: ${mapping.pid})`));
+      } else {
+        console.log(chalk.gray(`  - ${name} (already stopped)`));
       }
       await removeProcess(name);
-      console.log(chalk.green(`  ✓ ${name} (PID: ${mapping.pid})`));
       successCount++;
     } catch (error) {
       console.log(chalk.red(`  ✗ ${name}: ${(error as Error).message}`));

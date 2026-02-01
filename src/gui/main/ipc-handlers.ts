@@ -1,5 +1,6 @@
 import { ipcMain, shell, BrowserWindow } from 'electron';
 import { readFile, writeFile } from 'fs/promises';
+import { execSync } from 'child_process';
 import { join } from 'path';
 import { homedir } from 'os';
 import treeKill from 'tree-kill';
@@ -32,6 +33,15 @@ function killProcess(pid: number): Promise<void> {
   });
 }
 
+function stopComposeProcess(cwd: string, pid: number): void {
+  try {
+    execSync('docker compose down', { cwd, stdio: 'pipe' });
+  } catch {
+    // fallback: 프로세스만 kill
+    treeKill(pid, 'SIGTERM');
+  }
+}
+
 export function setupIpcHandlers(mainWindow: BrowserWindow): void {
   ipcMain.handle('stop-process', async (_event, name: string) => {
     const state = await loadState();
@@ -41,7 +51,11 @@ export function setupIpcHandlers(mainWindow: BrowserWindow): void {
       throw new Error(`Process not found: ${name}`);
     }
 
-    await killProcess(mapping.pid);
+    if (mapping.injectionType === 'compose') {
+      stopComposeProcess(mapping.cwd, mapping.pid);
+    } else {
+      await killProcess(mapping.pid);
+    }
 
     const { [name]: _, ...rest } = state.mappings;
     await saveState({ ...state, mappings: rest });
@@ -57,7 +71,11 @@ export function setupIpcHandlers(mainWindow: BrowserWindow): void {
 
     // 프로세스 종료 후 재시작은 CLI를 통해 해야 함
     // GUI에서는 단순히 중지만 수행
-    await killProcess(mapping.pid);
+    if (mapping.injectionType === 'compose') {
+      stopComposeProcess(mapping.cwd, mapping.pid);
+    } else {
+      await killProcess(mapping.pid);
+    }
 
     const { [name]: _, ...rest } = state.mappings;
     await saveState({ ...state, mappings: rest });
