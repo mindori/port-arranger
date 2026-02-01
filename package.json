@@ -1,18 +1,24 @@
 {
   "name": "port-arranger",
   "version": "0.0.1",
-  "description": "포트 충돌 없이 여러 개발 서버를 동시에 실행할 수 있게 해주는 도구",
+  "description": "Run multiple dev servers without port conflicts",
   "type": "module",
   "bin": {
     "pa": "./dist/cli/index.js"
   },
   "main": ".vite/build/index.cjs",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node dist/cli/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build",
     "build:gui": "electron-forge package",
     "dev:gui": "electron-forge start",
     "make:gui": "electron-forge make"
@@ -44,5 +50,27 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "keywords": [
+    "port",
+    "dev-server",
+    "cli",
+    "process-manager",
+    "port-conflict",
+    "developer-tools",
+    "nextjs",
+    "vite",
+    "express",
+    "fastapi"
+  ],
+  "author": "realmindori@gmail.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mindori/port-arranger"
+  },
+  "homepage": "https://github.com/mindori/port-arranger#readme",
+  "bugs": {
+    "url": "https://github.com/mindori/port-arranger/issues"
   }
 }
