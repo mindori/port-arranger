@@ -3,3 +3,5 @@ dist/
 .DS_Store
 doc/
 CLAUDE.md
+.vite/
+out/

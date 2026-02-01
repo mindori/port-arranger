@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import { runCommand } from './commands/run.js';
 import { listCommand } from './commands/list.js';
 import { stopCommand } from './commands/stop.js';
+import { uiCommand } from './commands/ui.js';
 
 const program = new Command();
 
@@ -49,6 +50,18 @@ program
   .action(async (name: string | undefined, options) => {
     try {
       await stopCommand(name, options);
+    } catch (error) {
+      console.error('오류:', (error as Error).message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('ui')
+  .description('GUI 대시보드 실행')
+  .action(async () => {
+    try {
+      await uiCommand();
     } catch (error) {
       console.error('오류:', (error as Error).message);
       process.exit(1);

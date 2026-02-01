@@ -36,3 +36,22 @@ export interface CommandPattern {
   injectionType: InjectionType;
   injectPort: (cmd: string, port: number) => string;
 }
+
+// Electron API (preload에서 노출)
+export interface ElectronAPI {
+  getProcesses: () => Promise<Record<string, ProcessMapping>>;
+  onProcessesUpdate: (callback: (processes: Record<string, ProcessMapping>) => void) => () => void;
+  stopProcess: (name: string) => Promise<void>;
+  restartProcess: (name: string) => Promise<void>;
+  openBrowser: (port: number) => Promise<void>;
+  setAlwaysOnTop: (value: boolean) => Promise<void>;
+  minimizeWindow: () => void;
+  closeWindow: () => void;
+}
+
+// Window 전역 타입 확장
+declare global {
+  interface Window {
+    electronAPI: ElectronAPI;
+  }
+}
