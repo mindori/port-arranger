@@ -54,10 +54,10 @@ async function runNormalCommand(
   // 포트 재주입 (실제 할당된 포트로)
   const finalInjection = injectPort(command, availablePort);
 
-  console.log(chalk.blue(`[${projectName}]`) + ` 포트 ${chalk.green(availablePort)} 할당`);
+  console.log(chalk.blue(`[${projectName}]`) + ` Port ${chalk.green(availablePort)} assigned`);
 
   if (options.dryRun) {
-    console.log(chalk.yellow('\n[dry-run] 실제 실행하지 않음'));
+    console.log(chalk.yellow('\n[dry-run] Not actually executing'));
     return;
   }
 
@@ -76,7 +76,7 @@ async function runNormalCommand(
 
   await addProcess(projectName, mapping);
 
-  console.log(chalk.green(`\n✓ 프로세스 시작됨 (PID: ${pid})`));
+  console.log(chalk.green(`\n✓ Process started (PID: ${pid})`));
   console.log(chalk.gray(`http://localhost:${availablePort}`));
 }
 
@@ -86,7 +86,7 @@ async function runComposeCommand(
   cwd: string,
   options: RunOptions
 ): Promise<void> {
-  console.log(chalk.blue(`[${projectName}]`) + ' Docker Compose 모드');
+  console.log(chalk.blue(`[${projectName}]`) + ' Docker Compose mode');
 
   // 1. docker-compose.yml 파싱
   const config = parseComposeFile(cwd);
@@ -94,7 +94,7 @@ async function runComposeCommand(
   const servicePorts = getAllServicePorts(config, serviceNames.length > 0 ? serviceNames : undefined);
 
   if (servicePorts.length === 0) {
-    console.log(chalk.yellow('포트가 노출된 서비스가 없습니다. 원본 명령어를 실행합니다.'));
+    console.log(chalk.yellow('No services with exposed ports. Running original command.'));
     if (!options.dryRun) {
       const pid = await spawnProcess(projectName, command, {}, cwd);
       await addProcess(projectName, {
@@ -155,14 +155,14 @@ async function runComposeCommand(
   }
 
   // 4. 포트 할당 결과 출력
-  console.log(chalk.blue('\n포트 할당:'));
+  console.log(chalk.blue('\nPort assignments:'));
   for (const line of portSummary) {
     console.log(line);
   }
 
   if (options.dryRun) {
-    console.log(chalk.yellow('\n[dry-run] 실제 실행하지 않음'));
-    console.log(chalk.gray(`명령어: ${finalCommand}`));
+    console.log(chalk.yellow('\n[dry-run] Not actually executing'));
+    console.log(chalk.gray(`Command: ${finalCommand}`));
     return;
   }
 
@@ -200,7 +200,7 @@ async function runComposeCommand(
 
   await addProcess(projectName, mapping);
 
-  console.log(chalk.green(`\n✓ Docker Compose 시작됨 (PID: ${pid})`));
+  console.log(chalk.green(`\n✓ Docker Compose started (PID: ${pid})`));
 
   // 각 서비스별 URL 출력
   for (const service of servicePorts) {

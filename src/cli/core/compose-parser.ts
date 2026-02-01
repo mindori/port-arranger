@@ -71,7 +71,7 @@ export function parsePortString(portStr: string | number): ComposePortMapping {
     };
   }
 
-  throw new Error(`지원하지 않는 포트 형식: ${portStr}`);
+  throw new Error(`Unsupported port format: ${portStr}`);
 }
 
 /**

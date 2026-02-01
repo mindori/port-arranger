@@ -1,6 +1,7 @@
 import React from 'react';
 import { TitleBar } from './components/TitleBar';
 import { ProcessList } from './components/ProcessList';
+import { GridBackground } from './components/GridBackground';
 import { useProcesses } from './hooks/useProcesses';
 
 const styles: Record<string, React.CSSProperties> = {
@@ -8,29 +9,37 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     height: '100vh',
-    backgroundColor: 'var(--bg-primary)',
+    backgroundColor: 'var(--bg-void)',
+    position: 'relative',
   },
   content: {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
+    position: 'relative',
+    zIndex: 1,
   },
   loading: {
     flex: 1,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: 'var(--text-secondary)',
+    fontFamily: 'var(--font-display)',
+    fontSize: '12px',
+    letterSpacing: '0.1em',
+    textTransform: 'uppercase',
+    color: 'var(--text-dim)',
   },
   error: {
     padding: '12px',
     margin: '12px',
-    backgroundColor: 'rgba(233, 69, 96, 0.1)',
-    border: '1px solid var(--accent)',
-    borderRadius: '8px',
-    color: 'var(--accent)',
-    fontSize: '13px',
+    backgroundColor: 'var(--status-stopped-dim)',
+    border: '1px solid var(--status-stopped)',
+    borderRadius: 'var(--radius-md)',
+    color: 'var(--status-stopped)',
+    fontFamily: 'var(--font-body)',
+    fontSize: '12px',
   },
 };
 
@@ -39,11 +48,12 @@ export default function App(): React.ReactElement {
 
   return (
     <div style={styles.app}>
+      <GridBackground />
       <TitleBar />
       <div style={styles.content}>
         {error && <div style={styles.error}>{error}</div>}
         {loading ? (
-          <div style={styles.loading}>로딩 중...</div>
+          <div style={styles.loading}>Scanning Docking Bays...</div>
         ) : (
           <ProcessList
             processes={processes}

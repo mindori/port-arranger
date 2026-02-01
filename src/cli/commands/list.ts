@@ -7,21 +7,21 @@ export async function listCommand(): Promise<void> {
   const entries = Object.entries(processes);
 
   if (entries.length === 0) {
-    console.log(chalk.gray('실행 중인 프로세스가 없습니다.'));
-    console.log(chalk.gray('pa run "<명령어>"로 프로세스를 시작하세요.'));
+    console.log(chalk.gray('No running processes.'));
+    console.log(chalk.gray('Start a process with \'pa run "<command>"\''));
     return;
   }
 
-  console.log(chalk.bold('\n실행 중인 프로세스:\n'));
+  console.log(chalk.bold('\nRunning processes:\n'));
 
   // 테이블 헤더
   console.log(
     chalk.gray(
-      padEnd('이름', 20) +
-      padEnd('포트', 8) +
+      padEnd('Name', 20) +
+      padEnd('Port', 8) +
       padEnd('PID', 10) +
-      padEnd('상태', 10) +
-      '명령어'
+      padEnd('Status', 10) +
+      'Command'
     )
   );
   console.log(chalk.gray('─'.repeat(80)));
@@ -29,8 +29,8 @@ export async function listCommand(): Promise<void> {
   for (const [name, mapping] of entries) {
     const running = isProcessRunning(mapping.pid);
     const status = running
-      ? chalk.green('실행중')
-      : chalk.red('중지됨');
+      ? chalk.green('Running')
+      : chalk.red('Stopped');
 
     const pid = String(mapping.pid);
     const cmd = truncate(mapping.originalCommand, 30);

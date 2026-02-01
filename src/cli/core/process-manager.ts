@@ -18,7 +18,7 @@ export async function spawnProcess(
     });
 
     child.on('error', (error) => {
-      reject(new Error(`프로세스 시작 실패: ${error.message}`));
+      reject(new Error(`Failed to start process: ${error.message}`));
     });
 
     // 프로세스가 시작되면 PID 반환
@@ -26,7 +26,7 @@ export async function spawnProcess(
       child.unref();
       resolve(child.pid);
     } else {
-      reject(new Error('프로세스 PID를 얻을 수 없습니다'));
+      reject(new Error('Could not get process PID'));
     }
   });
 }

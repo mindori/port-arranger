@@ -16,8 +16,8 @@ export async function stopCommand(
   }
 
   if (!name) {
-    console.log(chalk.red('프로세스 이름을 지정하거나 --all 옵션을 사용하세요.'));
-    console.log(chalk.gray('사용법: pa stop <이름> 또는 pa stop --all'));
+    console.log(chalk.red('Specify a process name or use --all option.'));
+    console.log(chalk.gray('Usage: pa stop <name> or pa stop --all'));
     return;
   }
 
@@ -28,26 +28,26 @@ async function stopSingleProcess(name: string): Promise<void> {
   const mapping = await getProcess(name);
 
   if (!mapping) {
-    console.log(chalk.red(`'${name}' 프로세스를 찾을 수 없습니다.`));
-    console.log(chalk.gray('pa list로 실행 중인 프로세스를 확인하세요.'));
+    console.log(chalk.red(`Process '${name}' not found.`));
+    console.log(chalk.gray("Use 'pa list' to see running processes."));
     return;
   }
 
   const { pid } = mapping;
 
   if (!isProcessRunning(pid)) {
-    console.log(chalk.yellow(`'${name}' 프로세스가 이미 종료되었습니다.`));
+    console.log(chalk.yellow(`Process '${name}' already stopped.`));
     await removeProcess(name);
-    console.log(chalk.gray('상태 목록에서 제거됨'));
+    console.log(chalk.gray('Removed from state'));
     return;
   }
 
   try {
     await killProcess(pid);
     await removeProcess(name);
-    console.log(chalk.green(`✓ '${name}' 프로세스 종료됨 (PID: ${pid})`));
+    console.log(chalk.green(`✓ Process '${name}' stopped (PID: ${pid})`));
   } catch (error) {
-    console.log(chalk.red(`프로세스 종료 실패: ${(error as Error).message}`));
+    console.log(chalk.red(`Failed to stop process: ${(error as Error).message}`));
   }
 }
 
@@ -56,11 +56,11 @@ async function stopAllProcesses(): Promise<void> {
   const entries = Object.entries(processes);
 
   if (entries.length === 0) {
-    console.log(chalk.gray('종료할 프로세스가 없습니다.'));
+    console.log(chalk.gray('No processes to stop.'));
     return;
   }
 
-  console.log(chalk.blue(`${entries.length}개 프로세스 종료 중...`));
+  console.log(chalk.blue(`Stopping ${entries.length} processes...`));
 
   let successCount = 0;
   let failCount = 0;
@@ -81,8 +81,8 @@ async function stopAllProcesses(): Promise<void> {
 
   console.log();
   if (failCount === 0) {
-    console.log(chalk.green(`✓ 모든 프로세스 종료 완료 (${successCount}개)`));
+    console.log(chalk.green(`✓ All processes stopped (${successCount})`));
   } else {
-    console.log(chalk.yellow(`완료: ${successCount}개 성공, ${failCount}개 실패`));
+    console.log(chalk.yellow(`Complete: ${successCount} succeeded, ${failCount} failed`));
   }
 }

@@ -1,0 +1,121 @@
+/* PORT ARRANGER 애니메이션 */
+
+/* 상태 표시등 펄스 */
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px currentColor);
+  }
+  50% {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+}
+
+/* 글로우 펄스 (배경용) */
+@keyframes glow-pulse-bg {
+  0%, 100% {
+    box-shadow: var(--glow-accent);
+  }
+  50% {
+    box-shadow: var(--glow-accent-strong);
+  }
+}
+
+/* 스캔라인 효과 */
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+/* 페이드 인 */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 슬라이드 인 (왼쪽에서) */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 스케일 인 */
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 상태바 글로우 */
+@keyframes status-bar-glow {
+  0%, 100% {
+    box-shadow: inset 0 0 10px currentColor, 0 0 5px currentColor;
+  }
+  50% {
+    box-shadow: inset 0 0 15px currentColor, 0 0 10px currentColor;
+  }
+}
+
+/* 그리드 흐름 (미묘한 움직임) */
+@keyframes grid-flow {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 50px 50px;
+  }
+}
+
+/* 유틸리티 클래스 */
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-slide-in {
+  animation: slide-in-left 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+/* 상태별 글로우 애니메이션 */
+.status-glow-running {
+  animation: status-bar-glow 2s ease-in-out infinite;
+  color: var(--status-running);
+}
+
+.status-glow-partial {
+  animation: status-bar-glow 1.5s ease-in-out infinite;
+  color: var(--status-partial);
+}
+
+.status-glow-stopped {
+  color: var(--status-stopped);
+}

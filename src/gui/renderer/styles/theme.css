@@ -1,0 +1,56 @@
+/* PORT ARRANGER 테마 변수 */
+:root {
+  /* 배경 - 깊은 우주 */
+  --bg-void: #0a0a12;
+  --bg-deep: #0d0d1a;
+  --bg-primary: #111122;
+  --bg-panel: #1a1a30;
+  --bg-card: #1e1e38;
+  --bg-card-hover: #252548;
+
+  /* 액센트 - 네온 그린/시안 */
+  --accent-primary: #00ff88;
+  --accent-secondary: #00d4ff;
+  --accent-primary-dim: rgba(0, 255, 136, 0.15);
+  --accent-secondary-dim: rgba(0, 212, 255, 0.15);
+
+  /* 상태 컬러 */
+  --status-running: #00ff88;
+  --status-partial: #ffaa00;
+  --status-stopped: #ff4444;
+  --status-running-dim: rgba(0, 255, 136, 0.1);
+  --status-partial-dim: rgba(255, 170, 0, 0.1);
+  --status-stopped-dim: rgba(255, 68, 68, 0.1);
+
+  /* 텍스트 */
+  --text-primary: #e8e8f0;
+  --text-secondary: #8888aa;
+  --text-dim: #555577;
+  --text-accent: var(--accent-secondary);
+
+  /* 보더 */
+  --border-primary: #2a2a4a;
+  --border-glow: rgba(0, 255, 136, 0.3);
+
+  /* 글로우 효과 */
+  --glow-accent: 0 0 20px rgba(0, 255, 136, 0.2);
+  --glow-accent-strong: 0 0 30px rgba(0, 255, 136, 0.4);
+  --glow-secondary: 0 0 20px rgba(0, 212, 255, 0.2);
+  --glow-status-running: 0 0 10px rgba(0, 255, 136, 0.5);
+  --glow-status-partial: 0 0 10px rgba(255, 170, 0, 0.5);
+  --glow-status-stopped: 0 0 10px rgba(255, 68, 68, 0.5);
+
+  /* 그리드 */
+  --grid-color: rgba(0, 255, 136, 0.03);
+  --grid-color-bright: rgba(0, 255, 136, 0.06);
+
+  /* 트랜지션 */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.4s ease;
+
+  /* 사이즈 */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}

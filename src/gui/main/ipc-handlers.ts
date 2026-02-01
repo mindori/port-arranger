@@ -38,7 +38,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow): void {
     const mapping = state.mappings[name];
 
     if (!mapping) {
-      throw new Error(`프로세스를 찾을 수 없습니다: ${name}`);
+      throw new Error(`Process not found: ${name}`);
     }
 
     await killProcess(mapping.pid);
@@ -52,7 +52,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow): void {
     const mapping = state.mappings[name];
 
     if (!mapping) {
-      throw new Error(`프로세스를 찾을 수 없습니다: ${name}`);
+      throw new Error(`Process not found: ${name}`);
     }
 
     // 프로세스 종료 후 재시작은 CLI를 통해 해야 함

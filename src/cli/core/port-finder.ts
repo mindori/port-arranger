@@ -60,7 +60,7 @@ export async function findAvailablePort(
     port = availablePort + 1;
   }
 
-  throw new Error('사용 가능한 포트를 찾을 수 없습니다');
+  throw new Error('Could not find an available port');
 }
 
 // 세션 종료 시 할당된 포트 초기화 (테스트용)

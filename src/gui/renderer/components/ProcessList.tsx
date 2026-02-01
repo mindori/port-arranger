@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ProcessMapping } from '../../../shared/types';
 import { ProcessItem } from './ProcessItem';
+import { EmptyState } from './EmptyState';
 
 interface ProcessListProps {
   processes: Record<string, ProcessMapping>;
@@ -9,46 +10,38 @@ interface ProcessListProps {
 }
 
 const styles: Record<string, React.CSSProperties> = {
+  header: {
+    padding: '12px 16px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottom: '1px solid var(--border-primary)',
+  },
+  headerTitle: {
+    fontFamily: 'var(--font-display)',
+    fontSize: '10px',
+    fontWeight: 600,
+    letterSpacing: '0.15em',
+    textTransform: 'uppercase',
+    color: 'var(--text-dim)',
+  },
+  headerCount: {
+    fontFamily: 'var(--font-display)',
+    fontSize: '11px',
+    fontWeight: 600,
+    letterSpacing: '0.1em',
+    color: 'var(--accent-primary)',
+    padding: '2px 8px',
+    backgroundColor: 'var(--accent-primary-dim)',
+    borderRadius: 'var(--radius-sm)',
+  },
   container: {
     flex: 1,
     overflow: 'auto',
     padding: '12px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
-  },
-  empty: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'var(--text-secondary)',
-    gap: '12px',
-    padding: '40px',
-    textAlign: 'center',
-  },
-  emptyTitle: {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: 'var(--text-primary)',
-  },
-  emptyHint: {
-    fontSize: '13px',
-    lineHeight: 1.5,
-  },
-  code: {
-    backgroundColor: 'var(--bg-item)',
-    padding: '4px 8px',
-    borderRadius: '4px',
-    fontFamily: 'monospace',
-    fontSize: '12px',
-  },
-  count: {
-    padding: '4px 12px',
-    fontSize: '12px',
-    color: 'var(--text-secondary)',
-    borderBottom: '1px solid var(--border)',
+    gap: '10px',
   },
 };
 
@@ -60,21 +53,15 @@ export function ProcessList({
   const entries = Object.entries(processes);
 
   if (entries.length === 0) {
-    return (
-      <div style={styles.empty}>
-        <span style={styles.emptyTitle}>실행 중인 프로세스 없음</span>
-        <span style={styles.emptyHint}>
-          터미널에서 <code style={styles.code}>pa run</code> 명령으로
-          <br />
-          개발 서버를 실행하세요
-        </span>
-      </div>
-    );
+    return <EmptyState />;
   }
 
   return (
     <>
-      <div style={styles.count}>{entries.length}개의 프로세스</div>
+      <div style={styles.header}>
+        <span style={styles.headerTitle}>Docking Bays</span>
+        <span style={styles.headerCount}>{entries.length} ACTIVE</span>
+      </div>
       <div style={styles.container}>
         {entries.map(([name, process]) => (
           <ProcessItem

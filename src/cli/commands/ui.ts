@@ -13,8 +13,8 @@ export async function uiCommand(): Promise<void> {
 
   if (!existsSync(electronPath)) {
     throw new Error(
-      'Electron이 설치되어 있지 않습니다.\n' +
-      'npm install을 실행한 후 다시 시도하세요.'
+      'Electron is not installed.\n' +
+      'Run npm install and try again.'
     );
   }
 
@@ -23,8 +23,8 @@ export async function uiCommand(): Promise<void> {
 
   if (!existsSync(mainPath)) {
     throw new Error(
-      'GUI가 빌드되지 않았습니다.\n' +
-      'npm run build:gui를 실행한 후 다시 시도하세요.'
+      'GUI is not built.\n' +
+      'Run npm run build:gui and try again.'
     );
   }
 
@@ -37,5 +37,5 @@ export async function uiCommand(): Promise<void> {
 
   child.unref();
 
-  console.log('Port Arranger GUI가 실행되었습니다.');
+  console.log('Port Arranger GUI launched.');
 }
