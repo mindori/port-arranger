@@ -8,6 +8,15 @@ import type { State } from '../../shared/types';
 
 const STATE_PATH = join(homedir(), '.port-arranger', 'state.json');
 
+const IPC_CHANNELS = {
+  STOP_PROCESS: 'stop-process',
+  RESTART_PROCESS: 'restart-process',
+  OPEN_BROWSER: 'open-browser',
+  SET_ALWAYS_ON_TOP: 'set-always-on-top',
+  MINIMIZE_WINDOW: 'minimize-window',
+  CLOSE_WINDOW: 'close-window',
+} as const;
+
 async function loadState(): Promise<State> {
   try {
     const content = await readFile(STATE_PATH, 'utf-8');
@@ -42,8 +51,17 @@ function stopComposeProcess(cwd: string, pid: number): void {
   }
 }
 
+export function cleanupIpcHandlers(): void {
+  ipcMain.removeHandler(IPC_CHANNELS.STOP_PROCESS);
+  ipcMain.removeHandler(IPC_CHANNELS.RESTART_PROCESS);
+  ipcMain.removeHandler(IPC_CHANNELS.OPEN_BROWSER);
+  ipcMain.removeHandler(IPC_CHANNELS.SET_ALWAYS_ON_TOP);
+  ipcMain.removeAllListeners(IPC_CHANNELS.MINIMIZE_WINDOW);
+  ipcMain.removeAllListeners(IPC_CHANNELS.CLOSE_WINDOW);
+}
+
 export function setupIpcHandlers(mainWindow: BrowserWindow): void {
-  ipcMain.handle('stop-process', async (_event, name: string) => {
+  ipcMain.handle(IPC_CHANNELS.STOP_PROCESS, async (_event, name: string) => {
     const state = await loadState();
     const mapping = state.mappings[name];
 
@@ -61,7 +79,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow): void {
     await saveState({ ...state, mappings: rest });
   });
 
-  ipcMain.handle('restart-process', async (_event, name: string) => {
+  ipcMain.handle(IPC_CHANNELS.RESTART_PROCESS, async (_event, name: string) => {
     const state = await loadState();
     const mapping = state.mappings[name];
 
@@ -81,19 +99,25 @@ export function setupIpcHandlers(mainWindow: BrowserWindow): void {
     await saveState({ ...state, mappings: rest });
   });
 
-  ipcMain.handle('open-browser', async (_event, port: number) => {
+  ipcMain.handle(IPC_CHANNELS.OPEN_BROWSER, async (_event, port: number) => {
     await shell.openExternal(`http://localhost:${port}`);
   });
 
-  ipcMain.handle('set-always-on-top', async (_event, value: boolean) => {
-    mainWindow.setAlwaysOnTop(value);
+  ipcMain.handle(IPC_CHANNELS.SET_ALWAYS_ON_TOP, async (_event, value: boolean) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.setAlwaysOnTop(value);
+    }
   });
 
-  ipcMain.on('minimize-window', () => {
-    mainWindow.minimize();
+  ipcMain.on(IPC_CHANNELS.MINIMIZE_WINDOW, () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.minimize();
+    }
   });
 
-  ipcMain.on('close-window', () => {
-    mainWindow.close();
+  ipcMain.on(IPC_CHANNELS.CLOSE_WINDOW, () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.close();
+    }
   });
 }

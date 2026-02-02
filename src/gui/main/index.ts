@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import { startWatching, stopWatching, addListener, getProcesses } from './state-watcher';
-import { setupIpcHandlers } from './ipc-handlers';
+import { setupIpcHandlers, cleanupIpcHandlers } from './ipc-handlers';
 
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string | undefined;
 declare const MAIN_WINDOW_VITE_NAME: string;
@@ -9,6 +9,10 @@ declare const MAIN_WINDOW_VITE_NAME: string;
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow(): void {
+  // 기존 IPC 핸들러 정리 (중복 등록 방지)
+  cleanupIpcHandlers();
+  ipcMain.removeHandler('get-processes');
+
   mainWindow = new BrowserWindow({
     width: 410,
     height: 500,
